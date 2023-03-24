@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import frc.robot.AutoCommands.Auto_01;
+import frc.robot.SequentialCommands.DeliverGamePiece;
 import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.Arm_To_Setpoint;
 //import frc.robot.commands.Autos;
@@ -101,15 +103,7 @@ public class RobotContainer {
     //EXTREME CONTROLLER
     
     extremeController.button(1).onTrue(new InstantCommand(() -> grabber.toggle()));
-    extremeController.button(9).onTrue(new SequentialCommandGroup(
-      new Pivot_To_Setpoint(56, m_pivot_MM),
-      new WaitCommand(0.5), 
-      //new Pivot_To_Setpoint(58, m_pivot_MM),
-      new Arm_To_Setpoint(20, m_arm_MM),
-      new WaitCommand(0.0),
-      new InstantCommand(() -> grabber.openGrabber()),
-      new WaitCommand(0.0)
-    ));
+    extremeController.button(9).onTrue(new DeliverGamePiece(m_pivot_MM, m_arm_MM, grabber));
 
     extremeController.button(7).onTrue(new Arm_To_Setpoint(30, m_arm_MM));
     extremeController.button(8).onTrue(new Pivot_To_Setpoint(56, m_pivot_MM));
@@ -146,32 +140,8 @@ public class RobotContainer {
 
 
   private void addAutoCommands()  {
-    autoCommandSelector.setDefaultOption(
-      "Auto Center",
-      new SequentialCommandGroup(
-        new InstantCommand(() -> m_arm_MM.my_resetEncoder()),
-        new WaitCommand(0.1),
-        new InstantCommand(() -> m_pivot_MM.my_resetEncoder()),
-        new WaitCommand(0.1),
-        new Pivot_To_Setpoint(70, m_pivot_MM),
-        new WaitCommand(0.5),
-        new Arm_To_Setpoint(37, m_arm_MM),
-        new WaitCommand(0.0),
-        new InstantCommand(() -> grabber.openGrabber()),
-        new WaitCommand(0.0),
-        new Arm_To_Setpoint(10.0, m_arm_MM),
-        new WaitCommand(1.0),
-        new InstantCommand(() -> grabber.closeGrabber()),
-        new WaitCommand(0.0),
-
-        new ParallelCommandGroup(
-          new Pivot_To_Setpoint(5, m_pivot_MM),
-          new DriveForwardDistance(drivetrain, -7.5)
-        ),
-        new ChargingStationAutoBalance(drivetrain)
-
-      )
-    );
+    autoCommandSelector.addOption("Auto Nothing", new WaitCommand(0));
+    autoCommandSelector.setDefaultOption("Auto Center", new Auto_01(m_pivot_MM, m_arm_MM, grabber, drivetrain));
     
   }
   //autoCommandSelector.addOption();
